@@ -1,18 +1,18 @@
-// Page view counter — increments on every page load
+// Page view counter — uses Supabase RPC to atomically increment
 (async () => {
+  if (!window.sb) return;
   const page = window.location.pathname;
-  const { data, error } = await window.sb
-    .from('page_views')
-    .upsert({ page, views: 1 }, { onConflict: 'page', ignoreDuplicates: false })
-    .select();
+
+  // Call the increment function
+  await window.sb.rpc('increment_page_view', { p_page: page });
 
   // Fetch updated count
-  const { data: row } = await window.sb
+  const { data: row, error } = await window.sb
     .from('page_views')
     .select('views')
     .eq('page', page)
     .single();
 
   const el = document.getElementById('view-count');
-  if (el && row) el.textContent = row.views.toLocaleString();
+  if (el) el.textContent = row ? row.views.toLocaleString() : '—';
 })();
