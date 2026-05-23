@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quiz 3: Quantum &amp; Binary Dimensions | Dimensional Existence</title>
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <style>
+    .question { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem; }
+    .question p { font-weight: 600; margin-bottom: 0.75rem; }
+    label { display: block; margin: 0.4rem 0; cursor: pointer; }
+    label:hover { color: var(--accent); }
+    #submit-btn { margin-top: 1rem; padding: 0.6rem 2rem; background: var(--accent); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; }
+    #result { margin-top: 1.5rem; font-size: 1.25rem; text-align: center; color: var(--accent); }
+    #name-section { margin-bottom: 1.5rem; }
+    #name-section input { padding: 0.5rem; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 1rem; width: 250px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Quiz 3: Quantum &amp; Binary Dimensions</h1>
+    <nav><a href="index.html">← Quizzes</a></nav>
+  </header>
+  <main>
+    <div id="name-section">
+      <label>Your Name: <input type="text" id="player-name" placeholder="Enter your name" /></label>
+    </div>
+    <form id="quiz-form">
+
+      <div class="question">
+        <p>1. In quantum mechanics, what is the term for a particle existing in multiple states simultaneously before observation?</p>
+        <label><input type="radio" name="q1" value="a"> Entanglement</label>
+        <label><input type="radio" name="q1" value="b"> Superposition</label>
+        <label><input type="radio" name="q1" value="c"> Tunneling</label>
+        <label><input type="radio" name="q1" value="d"> Decoherence</label>
+      </div>
+
+      <div class="question">
+        <p>2. In this framework, which physical act is analogous to a quantum observation collapsing a wavefunction?</p>
+        <label><input type="radio" name="q2" value="a"> Spinning a top</label>
+        <label><input type="radio" name="q2" value="b"> Throwing a ball</label>
+        <label><input type="radio" name="q2" value="c"> A coin landing on a surface under gravity</label>
+        <label><input type="radio" name="q2" value="d"> Reflecting light off a mirror</label>
+      </div>
+
+      <div class="question">
+        <p>3. In a database schema, what represents the pre-observation quantum state (before collapse)?</p>
+        <label><input type="radio" name="q3" value="a"> A committed row with a value</label>
+        <label><input type="radio" name="q3" value="b"> A nullable boolean that has not yet been resolved</label>
+        <label><input type="radio" name="q3" value="c"> A PRIMARY KEY constraint</label>
+        <label><input type="radio" name="q3" value="d"> An index on a table</label>
+      </div>
+
+      <div class="question">
+        <p>4. Why is the 4th dimension treated as binary in this framework rather than continuous?</p>
+        <label><input type="radio" name="q4" value="a"> Because databases only support two data types</label>
+        <label><input type="radio" name="q4" value="b"> Because time only moves forward</label>
+        <label><input type="radio" name="q4" value="c"> Because quantum mechanical observation produces exactly two outcomes — the state is either resolved or it isn’t</label>
+        <label><input type="radio" name="q4" value="d"> Because polyhedra only have even numbers of faces</label>
+      </div>
+
+      <div class="question">
+        <p>5. What notation represents a coin in the polyhedral die system?</p>
+        <label><input type="radio" name="q5" value="a"> d1</label>
+        <label><input type="radio" name="q5" value="b"> d0</label>
+        <label><input type="radio" name="q5" value="c"> d2</label>
+        <label><input type="radio" name="q5" value="d"> d3</label>
+      </div>
+
+      <div class="question">
+        <p>6. Two quantum-entangled particles share state across space. What is the schema equivalent of this relationship?</p>
+        <label><input type="radio" name="q6" value="a"> Two tables with no relationship</label>
+        <label><input type="radio" name="q6" value="b"> Two columns in the same row</label>
+        <label><input type="radio" name="q6" value="c"> Two tables linked by a foreign key with a CASCADE rule</label>
+        <label><input type="radio" name="q6" value="d"> A VIEW combining two tables</label>
+      </div>
+
+      <div class="question">
+        <p>7. In Dirac notation, a binary quantum state is written as |0⟩ or |1⟩. What is the SQL equivalent of these two states?</p>
+        <label><input type="radio" name="q7" value="a"> NULL and NOT NULL</label>
+        <label><input type="radio" name="q7" value="b"> TRUE and FALSE</label>
+        <label><input type="radio" name="q7" value="c"> 0 and 100</label>
+        <label><input type="radio" name="q7" value="d"> INTEGER and TEXT</label>
+      </div>
+
+      <div class="question">
+        <p>8. When a new dimension is added to the system, what principle governs its relationship to all existing dimensions?</p>
+        <label><input type="radio" name="q8" value="a"> It operates independently with no connection to other dimensions</label>
+        <label><input type="radio" name="q8" value="b"> What happens to one dimension happens to all — each new dimension links via the same constraint rules</label>
+        <label><input type="radio" name="q8" value="c"> It replaces the previous highest dimension</label>
+        <label><input type="radio" name="q8" value="d"> It must have more faces than the previous dimension</label>
+      </div>
+
+      <div class="question">
+        <p>9. Which famous thought experiment illustrates quantum superposition using a cat that is simultaneously alive and dead until observed?</p>
+        <label><input type="radio" name="q9" value="a"> Maxwell’s Demon</label>
+        <label><input type="radio" name="q9" value="b"> Laplace’s Demon</label>
+        <label><input type="radio" name="q9" value="c"> Schrödinger’s Cat</label>
+        <label><input type="radio" name="q9" value="d"> Occam’s Razor</label>
+      </div>
+
+      <div class="question">
+        <p>10. A database trigger that fires when a boolean column is updated from NULL to TRUE or FALSE most closely models which quantum event?</p>
+        <label><input type="radio" name="q10" value="a"> Quantum tunneling</label>
+        <label><input type="radio" name="q10" value="b"> Wave interference</label>
+        <label><input type="radio" name="q10" value="c"> Wavefunction collapse upon observation</label>
+        <label><input type="radio" name="q10" value="d"> Quantum entanglement initialization</label>
+      </div>
+
+      <button type="button" id="submit-btn" onclick="submitQuiz()">Submit</button>
+    </form>
+    <div id="result"></div>
+    <p style="text-align:center; margin-top:1.5rem"><a href="../leaderboard/index.html">🏆 View Leaderboard</a></p>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../assets/js/supabase-client.js"></script>
+  <script src="quiz-engine.js"></script>
+  <script>
+    const ANSWERS = { q1: 'b', q2: 'c', q3: 'b', q4: 'c', q5: 'c', q6: 'c', q7: 'b', q8: 'b', q9: 'c', q10: 'c' };
+    const QUIZ_ID = 'quiz-quantum';
+  </script>
+</body>
+</html>
