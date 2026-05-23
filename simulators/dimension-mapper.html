@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dimension Mapper | Dimensional Existence</title>
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <style>
+    table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+    th, td { padding: 0.75rem 1rem; border: 1px solid var(--border); text-align: left; }
+    th { background: var(--surface); color: var(--accent); }
+    tr:hover { background: var(--surface); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Dimension → Schema Mapper</h1>
+    <nav><a href="index.html">← Simulators</a></nav>
+  </header>
+  <main>
+    <p>This table maps each polyhedral die to its dimensional equivalent in a relational schema.</p>
+    <table>
+      <thead>
+        <tr><th>Die</th><th>Faces</th><th>Polyhedron</th><th>Schema Equivalent</th><th>Constraint Type</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>d2 (coin)</td><td>2</td><td>Degenerate / Disk</td><td>BOOLEAN column</td><td>CHECK (val IN (true, false))</td></tr>
+        <tr><td>d4</td><td>4</td><td>Tetrahedron</td><td>ENUM (4 values)</td><td>CHECK constraint</td></tr>
+        <tr><td>d6</td><td>6</td><td>Cube</td><td>Lookup table (6 rows)</td><td>Foreign key</td></tr>
+        <tr><td>d8</td><td>8</td><td>Octahedron</td><td>Lookup table (8 rows)</td><td>Foreign key</td></tr>
+        <tr><td>d10</td><td>10</td><td>Pentagonal trapezohedron</td><td>Lookup table (10 rows)</td><td>Foreign key</td></tr>
+        <tr><td>d12</td><td>12</td><td>Dodecahedron</td><td>Lookup table (12 rows)</td><td>Foreign key</td></tr>
+        <tr><td>d20</td><td>20</td><td>Icosahedron</td><td>Lookup table (20 rows)</td><td>Foreign key</td></tr>
+        <tr><td>d100</td><td>100</td><td>Zocchihedron</td><td>Lookup table (100 rows)</td><td>Foreign key</td></tr>
+      </tbody>
+    </table>
+  </main>
+</body>
+</html>

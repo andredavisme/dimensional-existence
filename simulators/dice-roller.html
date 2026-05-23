@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dice Roller | Dimensional Existence</title>
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <style>
+    .dice-grid { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1.5rem; }
+    .die {
+      background: var(--surface);
+      border: 2px solid var(--accent);
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.1s;
+      min-width: 100px;
+    }
+    .die:hover { transform: scale(1.05); background: var(--accent); }
+    .die h3 { font-size: 1.5rem; margin-bottom: 0.25rem; }
+    .die p { color: var(--muted); font-size: 0.85rem; }
+    #result {
+      margin-top: 2rem;
+      font-size: 2rem;
+      text-align: center;
+      color: var(--accent);
+    }
+    #history { margin-top: 1rem; color: var(--muted); font-size: 0.9rem; text-align: center; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Polyhedral Dice Roller</h1>
+    <nav><a href="index.html">← Simulators</a></nav>
+  </header>
+  <main>
+    <p>Click a die to roll it. Each face represents a discrete state in that dimension.</p>
+    <div class="dice-grid">
+      <div class="die" onclick="roll(2)"><h3>d2</h3><p>Coin / Binary</p></div>
+      <div class="die" onclick="roll(4)"><h3>d4</h3><p>Tetrahedron</p></div>
+      <div class="die" onclick="roll(6)"><h3>d6</h3><p>Cube</p></div>
+      <div class="die" onclick="roll(8)"><h3>d8</h3><p>Octahedron</p></div>
+      <div class="die" onclick="roll(10)"><h3>d10</h3><p>Pentagonal</p></div>
+      <div class="die" onclick="roll(12)"><h3>d12</h3><p>Dodecahedron</p></div>
+      <div class="die" onclick="roll(20)"><h3>d20</h3><p>Icosahedron</p></div>
+      <div class="die" onclick="roll(100)"><h3>d100</h3><p>Percentile</p></div>
+    </div>
+    <div id="result">—</div>
+    <div id="history"></div>
+  </main>
+  <script>
+    const history = [];
+    function roll(sides) {
+      const result = Math.floor(Math.random() * sides) + 1;
+      document.getElementById('result').textContent = `d${sides} → ${result}`;
+      history.unshift(`d${sides}: ${result}`);
+      if (history.length > 10) history.pop();
+      document.getElementById('history').textContent = 'History: ' + history.join(' | ');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Leaderboard | Dimensional Existence</title>
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <style>
+    table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+    th, td { padding: 0.75rem 1rem; border: 1px solid var(--border); text-align: left; }
+    th { background: var(--surface); color: var(--accent); }
+    tr:nth-child(even) { background: var(--surface); }
+    #rank-1 td { color: gold; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🏆 Leaderboard</h1>
+    <nav><a href="../index.html">← Home</a></nav>
+  </header>
+  <main>
+    <h2>Top Scores</h2>
+    <table>
+      <thead>
+        <tr><th>Rank</th><th>Name</th><th>Quiz</th><th>Score</th><th>%</th></tr>
+      </thead>
+      <tbody id="leaderboard-body">
+        <tr><td colspan="5">Loading...</td></tr>
+      </tbody>
+    </table>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../assets/js/supabase-client.js"></script>
+  <script>
+    (async () => {
+      const { data } = await window.sb
+        .from('quiz_attempts')
+        .select('player_name, quiz_id, score, total_questions, pct_score')
+        .order('pct_score', { ascending: false })
+        .order('score', { ascending: false })
+        .limit(50);
+
+      const tbody = document.getElementById('leaderboard-body');
+      if (!data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5">No scores yet. Take a quiz!</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map((row, i) => `
+        <tr id="rank-${i+1}">
+          <td>${i+1}</td>
+          <td>${row.player_name}</td>
+          <td>${row.quiz_id}</td>
+          <td>${row.score}/${row.total_questions}</td>
+          <td>${row.pct_score}%</td>
+        </tr>`).join('');
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quiz 1: Dimensions &amp; Polyhedra | Dimensional Existence</title>
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <style>
+    .question { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem; }
+    .question p { font-weight: 600; margin-bottom: 0.75rem; }
+    label { display: block; margin: 0.4rem 0; cursor: pointer; }
+    label:hover { color: var(--accent); }
+    #submit-btn { margin-top: 1rem; padding: 0.6rem 2rem; background: var(--accent); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; }
+    #result { margin-top: 1.5rem; font-size: 1.25rem; text-align: center; color: var(--accent); }
+    #name-section { margin-bottom: 1.5rem; }
+    #name-section input { padding: 0.5rem; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 1rem; width: 250px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Quiz 1: Dimensions &amp; Polyhedra</h1>
+    <nav><a href="index.html">← Quizzes</a></nav>
+  </header>
+  <main>
+    <div id="name-section">
+      <label>Your Name: <input type="text" id="player-name" placeholder="Enter your name" /></label>
+    </div>
+    <form id="quiz-form">
+      <div class="question">
+        <p>1. How many faces does an icosahedron (d20) have?</p>
+        <label><input type="radio" name="q1" value="12"> 12</label>
+        <label><input type="radio" name="q1" value="20"> 20</label>
+        <label><input type="radio" name="q1" value="8"> 8</label>
+        <label><input type="radio" name="q1" value="6"> 6</label>
+      </div>
+      <div class="question">
+        <p>2. Which Platonic solid has 6 faces?</p>
+        <label><input type="radio" name="q2" value="tetrahedron"> Tetrahedron</label>
+        <label><input type="radio" name="q2" value="cube"> Cube</label>
+        <label><input type="radio" name="q2" value="octahedron"> Octahedron</label>
+        <label><input type="radio" name="q2" value="dodecahedron"> Dodecahedron</label>
+      </div>
+      <div class="question">
+        <p>3. How many regular convex polyhedra exist in 3D space?</p>
+        <label><input type="radio" name="q3" value="3"> 3</label>
+        <label><input type="radio" name="q3" value="5"> 5</label>
+        <label><input type="radio" name="q3" value="7"> 7</label>
+        <label><input type="radio" name="q3" value="infinite"> Infinite</label>
+      </div>
+      <div class="question">
+        <p>4. A coin represents which type of dimensional state?</p>
+        <label><input type="radio" name="q4" value="continuous"> Continuous / extensive</label>
+        <label><input type="radio" name="q4" value="binary"> Binary / finite (2 states)</label>
+        <label><input type="radio" name="q4" value="hexagonal"> Hexagonal (6 states)</label>
+        <label><input type="radio" name="q4" value="null"> Null (no state)</label>
+      </div>
+      <div class="question">
+        <p>5. What physical force acts as the constraint that collapses a die to one face?</p>
+        <label><input type="radio" name="q5" value="magnetism"> Magnetism</label>
+        <label><input type="radio" name="q5" value="gravity"> Gravity</label>
+        <label><input type="radio" name="q5" value="friction"> Friction</label>
+        <label><input type="radio" name="q5" value="entropy"> Entropy</label>
+      </div>
+      <button type="button" id="submit-btn" onclick="submitQuiz()">Submit</button>
+    </form>
+    <div id="result"></div>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../assets/js/supabase-client.js"></script>
+  <script src="quiz-engine.js"></script>
+  <script>
+    const ANSWERS = { q1: '20', q2: 'cube', q3: '5', q4: 'binary', q5: 'gravity' };
+    const QUIZ_ID = 'quiz-dimensions';
+  </script>
+</body>
+</html>
