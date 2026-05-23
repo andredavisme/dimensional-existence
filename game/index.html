@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dimensional Game | Dimensional Existence</title>
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <style>
+    body { padding: 1rem; }
+
+    h1 { text-align: center; color: var(--accent); margin-bottom: 0.25rem; }
+    .subtitle { text-align: center; color: var(--muted); font-size: 0.9rem; margin-bottom: 1.25rem; }
+
+    #panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+      height: calc(100vh - 160px);
+    }
+
+    .panel {
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+    }
+
+    .panel-header {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--accent);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-header span.dim-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    canvas {
+      flex: 1;
+      display: block;
+      width: 100%;
+    }
+
+    #controls {
+      text-align: center;
+      margin-top: 0.75rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    #controls kbd {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.1rem 0.4rem;
+      font-family: monospace;
+      color: var(--text);
+    }
+
+    nav { text-align: center; margin-bottom: 0.5rem; }
+  </style>
+</head>
+<body>
+  <nav><a href="../index.html">← Home</a></nav>
+  <h1>🎮 Dimensional Game</h1>
+  <p class="subtitle">One input. Three dimensional interpretations. Move with arrow keys or WASD.</p>
+
+  <div id="panels">
+    <!-- Panel 1: 3D Space -->
+    <div class="panel">
+      <div class="panel-header">
+        📐 Dimension 1–3: Physical Space
+        <span class="dim-label">x / y / z — cursor in space</span>
+      </div>
+      <canvas id="canvas-space"></canvas>
+    </div>
+
+    <!-- Panel 2: Quantum Binary -->
+    <div class="panel">
+      <div class="panel-header">
+        ⚛️ Dimension 4: Quantum Binary
+        <span class="dim-label">movement → state collapse</span>
+      </div>
+      <canvas id="canvas-quantum"></canvas>
+    </div>
+
+    <!-- Panel 3: Schema -->
+    <div class="panel">
+      <div class="panel-header">
+        🗄️ Dimension 5: Schema / Meta
+        <span class="dim-label">movement → table events</span>
+      </div>
+      <canvas id="canvas-schema"></canvas>
+    </div>
+  </div>
+
+  <div id="controls">
+    Move: <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> or <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>
+    &nbsp;&nbsp;|&nbsp;&nbsp;
+    <kbd>Space</kbd> to reset all panels
+  </div>
+
+  <script>
+  // ─── Shared State ───────────────────────────────────────────────────────────
+  const speed = 3;
+  const player = { x: 0.5, y: 0.5 }; // normalized 0..1
+  const keys = {};
+
+  document.addEventListener('keydown', e => {
+    keys[e.key] = true;
+    if (e.key === ' ') resetAll();
+    if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) e.preventDefault();
+  });
+  document.addEventListener('keyup', e => { keys[e.key] = false; });
+
+  // ─── Canvas Setup ───────────────────────────────────────────────────────────
+  const panels = [
+    document.getElementById('canvas-space'),
+    document.getElementById('canvas-quantum'),
+    document.getElementById('canvas-schema')
+  ];
+
+  function resizeCanvases() {
+    panels.forEach(c => {
+      c.width = c.offsetWidth;
+      c.height = c.offsetHeight;
+    });
+  }
+  window.addEventListener('resize', resizeCanvases);
+  setTimeout(resizeCanvases, 100);
+
+  // ─── Panel 1: 3D Space ──────────────────────────────────────────────────────
+  // Shows cursor moving in 2D (x,y). Z-axis shown as shadow/depth ring.
+  // Trail records movement history.
+  const trail = [];
+  const MAX_TRAIL = 120;
+
+  function drawSpace(c) {
+    const ctx = c.getContext('2d');
+    const w = c.width, h = c.height;
+    if (!w || !h) return;
+    const cx = player.x * w;
+    const cy = player.y * h;
+
+    ctx.clearRect(0, 0, w, h);
+
+    // Grid
+    ctx.strokeStyle = '#1e1e3a';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < w; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+    for (let y = 0; y < h; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+
+    // Axis labels
+    ctx.fillStyle = '#333366';
+    ctx.font = '11px monospace';
+    ctx.fillText('x →', w - 28, h - 6);
+    ctx.fillText('y ↓', 6, 16);
+
+    // Trail
+    trail.forEach((p, i) => {
+      const alpha = i / trail.length;
+      ctx.beginPath();
+      ctx.arc(p.x * w, p.y * h, 2, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(124, 106, 247, ${alpha * 0.6})`;
+      ctx.fill();
+    });
+
+    // Z-depth ring (oscillates based on movement speed)
+    const zPulse = 8 + Math.sin(Date.now() / 300) * 4;
+    ctx.beginPath();
+    ctx.arc(cx, cy, zPulse + 14, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(124,106,247,0.2)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Cursor
+    ctx.beginPath();
+    ctx.arc(cx, cy, 8, 0, Math.PI * 2);
+    ctx.fillStyle = '#7c6af7';
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Coordinates
+    ctx.fillStyle = '#7c6af7';
+    ctx.font = '11px monospace';
+    ctx.fillText(`x: ${player.x.toFixed(3)}  y: ${player.y.toFixed(3)}  z: ${(Math.sin(Date.now()/300)*0.5+0.5).toFixed(3)}`, 8, h - 8);
+  }
+
+  // ─── Panel 2: Quantum Binary ─────────────────────────────────────────────────
+  // Every movement step has a chance to flip quantum state (|0⟩ / |1⟩).
+  // Direction maps: up/right = bias toward |1⟩, down/left = bias toward |0⟩.
+  // Displays waveform interference pattern.
+  let qState = null; // null = superposition
+  let qHistory = []; // array of {state, t}
+  let qFlipTimer = 0;
+  const Q_FLIP_INTERVAL = 18; // frames between potential collapses
+
+  function updateQuantum(moved, dx, dy) {
+    qFlipTimer++;
+    if (moved && qFlipTimer >= Q_FLIP_INTERVAL) {
+      qFlipTimer = 0;
+      // Direction bias
+      const bias = (dx + (-dy)) / (Math.abs(dx) + Math.abs(dy) + 0.001);
+      const p1 = Math.max(0.1, Math.min(0.9, 0.5 + bias * 0.4));
+      qState = Math.random() < p1 ? 1 : 0;
+      qHistory.push({ state: qState, t: Date.now() });
+      if (qHistory.length > 40) qHistory.shift();
+      // Return to superposition after brief display
+      setTimeout(() => { qState = null; }, 400);
+    }
+  }
+
+  function drawQuantum(c) {
+    const ctx = c.getContext('2d');
+    const w = c.width, h = c.height;
+    if (!w || !h) return;
+    const mid = h / 2;
+
+    ctx.clearRect(0, 0, w, h);
+
+    // Waveform
+    ctx.beginPath();
+    const waveColor = qState === null ? '#7c6af7' : qState === 1 ? '#4ade80' : '#f87171';
+    ctx.strokeStyle = waveColor;
+    ctx.lineWidth = 2;
+    const freq = qState === null ? 0.04 : (qState === 1 ? 0.08 : 0.02);
+    const amp = qState === null ? 30 : 12;
+    for (let x = 0; x < w; x++) {
+      const y = mid + Math.sin((x + Date.now() * 0.05) * freq) * amp
+                    + Math.sin((x + Date.now() * 0.03) * freq * 1.7) * (amp * 0.4);
+      x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    // State display
+    const label = qState === null ? '|0⟩ + |1⟩' : `|${qState}⟩`;
+    const stateColor = qState === null ? '#7c6af7' : qState === 1 ? '#4ade80' : '#f87171';
+    ctx.font = 'bold 2.5rem monospace';
+    ctx.fillStyle = stateColor;
+    ctx.textAlign = 'center';
+    ctx.fillText(label, w / 2, mid - 45);
+
+    const sublabel = qState === null ? 'superposition' : qState === 1 ? 'collapsed → TRUE' : 'collapsed → FALSE';
+    ctx.font = '0.8rem monospace';
+    ctx.fillStyle = '#888';
+    ctx.fillText(sublabel, w / 2, mid - 22);
+
+    // History dots
+    ctx.textAlign = 'left';
+    qHistory.slice(-20).forEach((entry, i) => {
+      const dotX = 12 + i * (w - 24) / 20;
+      const dotY = h - 20;
+      ctx.beginPath();
+      ctx.arc(dotX, dotY, 5, 0, Math.PI * 2);
+      ctx.fillStyle = entry.state === 1 ? '#4ade80' : '#f87171';
+      ctx.fill();
+    });
+
+    ctx.fillStyle = '#555';
+    ctx.font = '10px monospace';
+    ctx.fillText('collapse history →', 8, h - 32);
+  }
+
+  // ─── Panel 3: Schema / Meta ──────────────────────────────────────────────────
+  // Movement generates "schema events" — INSERT, UPDATE, SELECT, CASCADE.
+  // Each event is tied to direction and logged as a scrolling feed.
+  // A mini ERD diagram shows tables lighting up on event.
+  const schemaLog = [];
+  const MAX_LOG = 12;
+  let schemaTimer = 0;
+  const SCHEMA_INTERVAL = 22;
+
+  const DIRECTION_EVENTS = {
+    up:    { op: 'INSERT', table: 'dimensions', color: '#4ade80' },
+    down:  { op: 'DELETE', table: 'faces',      color: '#f87171' },
+    left:  { op: 'SELECT', table: 'polyhedra',  color: '#60a5fa' },
+    right: { op: 'UPDATE', table: 'quiz_attempts', color: '#fbbf24' },
+    diag:  { op: 'CASCADE', table: 'page_views', color: '#c084fc' },
+  };
+
+  let activeTable = null;
+
+  function updateSchema(moved, dx, dy) {
+    schemaTimer++;
+    if (moved && schemaTimer >= SCHEMA_INTERVAL) {
+      schemaTimer = 0;
+      let dir;
+      if (Math.abs(dx) > 0 && Math.abs(dy) > 0) dir = 'diag';
+      else if (dy < 0) dir = 'up';
+      else if (dy > 0) dir = 'down';
+      else if (dx < 0) dir = 'left';
+      else dir = 'right';
+
+      const evt = DIRECTION_EVENTS[dir];
+      schemaLog.unshift({ ...evt, ts: new Date().toLocaleTimeString('en-US', { hour12: false, hour:'2-digit', minute:'2-digit', second:'2-digit' }) });
+      if (schemaLog.length > MAX_LOG) schemaLog.pop();
+      activeTable = evt.table;
+      setTimeout(() => { activeTable = null; }, 500);
+    }
+  }
+
+  const TABLES = [
+    { name: 'dimensions',    x: 0.15, y: 0.18 },
+    { name: 'polyhedra',     x: 0.55, y: 0.18 },
+    { name: 'faces',         x: 0.55, y: 0.42 },
+    { name: 'quiz_attempts', x: 0.15, y: 0.42 },
+    { name: 'page_views',    x: 0.35, y: 0.62 },
+  ];
+
+  function drawSchema(c) {
+    const ctx = c.getContext('2d');
+    const w = c.width, h = c.height;
+    if (!w || !h) return;
+    ctx.clearRect(0, 0, w, h);
+
+    const erdH = h * 0.72;
+    const logH = h - erdH;
+
+    // ERD area
+    // FK lines
+    const getPos = name => {
+      const t = TABLES.find(t => t.name === name);
+      return { x: t.x * w, y: t.y * erdH + 14 };
+    };
+    const links = [
+      ['dimensions', 'polyhedra'],
+      ['polyhedra', 'faces'],
+      ['dimensions', 'quiz_attempts'],
+      ['quiz_attempts', 'page_views'],
+      ['polyhedra', 'page_views'],
+    ];
+    links.forEach(([a, b]) => {
+      const pa = getPos(a), pb = getPos(b);
+      ctx.beginPath();
+      ctx.moveTo(pa.x + 55, pa.y);
+      ctx.lineTo(pb.x, pb.y);
+      ctx.strokeStyle = '#2e2e4a';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    });
+
+    // Table boxes
+    TABLES.forEach(t => {
+      const tx = t.x * w;
+      const ty = t.y * erdH;
+      const isActive = t.name === activeTable;
+      const evt = schemaLog[0];
+      const color = isActive && evt ? evt.color : '#2e2e4a';
+
+      ctx.fillStyle = isActive ? color + '33' : '#1a1a2e';
+      ctx.strokeStyle = color;
+      ctx.lineWidth = isActive ? 2 : 1;
+      ctx.beginPath();
+      ctx.roundRect(tx, ty, 110, 28, 5);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = isActive ? color : '#888';
+      ctx.font = `${isActive ? 'bold ' : ''}11px monospace`;
+      ctx.fillText(t.name, tx + 8, ty + 18);
+    });
+
+    // Log area
+    ctx.fillStyle = '#0d0d1a';
+    ctx.fillRect(0, erdH, w, logH);
+    ctx.strokeStyle = '#2e2e4a';
+    ctx.beginPath();
+    ctx.moveTo(0, erdH);
+    ctx.lineTo(w, erdH);
+    ctx.stroke();
+
+    ctx.font = '10px monospace';
+    ctx.fillStyle = '#555';
+    ctx.fillText('schema event log', 8, erdH + 13);
+
+    schemaLog.forEach((entry, i) => {
+      const ly = erdH + 26 + i * 14;
+      if (ly > h - 4) return;
+      ctx.fillStyle = i === 0 ? entry.color : '#555';
+      ctx.fillText(`${entry.ts}  ${entry.op}  →  ${entry.table}`, 8, ly);
+    });
+  }
+
+  // ─── Game Loop ───────────────────────────────────────────────────────────────
+  function resetAll() {
+    player.x = 0.5;
+    player.y = 0.5;
+    trail.length = 0;
+    qHistory.length = 0;
+    schemaLog.length = 0;
+    qState = null;
+  }
+
+  function loop() {
+    const c = panels[0];
+    const w = c.width || 1, h = c.height || 1;
+    let dx = 0, dy = 0;
+
+    if (keys['ArrowLeft']  || keys['a'] || keys['A']) dx -= speed / w;
+    if (keys['ArrowRight'] || keys['d'] || keys['D']) dx += speed / w;
+    if (keys['ArrowUp']    || keys['w'] || keys['W']) dy -= speed / h;
+    if (keys['ArrowDown']  || keys['s'] || keys['S']) dy += speed / h;
+
+    player.x = Math.max(0, Math.min(1, player.x + dx));
+    player.y = Math.max(0, Math.min(1, player.y + dy));
+
+    const moved = dx !== 0 || dy !== 0;
+    if (moved) {
+      trail.push({ x: player.x, y: player.y });
+      if (trail.length > MAX_TRAIL) trail.shift();
+    }
+
+    updateQuantum(moved, dx, dy);
+    updateSchema(moved, dx, dy);
+
+    panels.forEach((c, i) => {
+      if (i === 0) drawSpace(c);
+      else if (i === 1) drawQuantum(c);
+      else drawSchema(c);
+    });
+
+    requestAnimationFrame(loop);
+  }
+
+  loop();
+  </script>
+</body>
+</html>
